@@ -30,5 +30,6 @@ urlpatterns = [
             name="accounts-jwt-refresh"), 
     path("auth/jwt/verify", views.TokenVerifyView.as_view(),
             name="accounts-jwt-verify"),
+    path('user/<username>/contact-list',Contacts.as_view(),name='contacts'),
 #     path(r'^jwt/token/?', views.TokenObtainPairView.as_view(serializer_class=myTokenObtainPairSerializer), name='accounts-jwt-token-new'),
 ]

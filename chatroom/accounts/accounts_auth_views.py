@@ -90,7 +90,7 @@ class AccountAuthViewSet(GenericViewSet, mixins.CreateModelMixin, mixins.Retriev
                 template = render_to_string(
                     'activation.html',
                     {
-                        'username': unregistered_user.username,
+                        'username': user_username,
                         'otp': otp,
                         'WEBSITE_URL': 'chatroom.ir',
                     }

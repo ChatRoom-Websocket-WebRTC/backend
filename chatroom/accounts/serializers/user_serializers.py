@@ -25,7 +25,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = User
-        fields = ['id', 'full_name', 'email', 'image', 'username', 'about_me', 'following_number', 'follower_number', 'following', 'is_owner','is_admin']
+        fields = ['id', 'full_name', 'email', 'image', 'username', 'about_me', 'following_number', 'follower_number', 'following', 'is_owner','is_admin','contact_list']
         read_only_fields = ('email', 'following_number', 'follower_number', 'is_owner','is_admin')
         
     def get_is_owner(self, user):
@@ -41,6 +41,11 @@ class UserProfileSerializer(serializers.ModelSerializer):
         if request_user.is_authenticated:
             status =  request_user.follows(user) or request_user == user
         return status
+    
+class UserContactListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['contact_list']
 
 class UserFeedSerializer(serializers.ModelSerializer):
     following = serializers.SerializerMethodField('get_following')

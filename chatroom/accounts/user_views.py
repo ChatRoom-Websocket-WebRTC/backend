@@ -45,6 +45,24 @@ class UserProfile(GenericAPIView):
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+class Contacts(GenericAPIView):
+    def get(self,request,username):
+        try:
+            user = User.objects.get(username=username)
+        except Exception:
+            return Response({"error":"user does not exists"},status=status.HTTP_400_BAD_REQUEST)
+        serializer = UserContactListSerializer(user)
+        contacts = str(serializer.data['contact_list'])
+        contacts = contacts.split(",")
+        contacts_list = {}
+        counter = 0
+        for contact in contacts:
+            contact = User.objects.get(id = contact)
+            contacts_list[counter] = ({"username":contact.username,"phone":contact.phone_no,"email":contact.email,"firstname":contact.first_name,"lastname":contact.last_name,"last_login":contact.last_login})
+            counter += 1
+        print(contacts_list)
+        return Response(contacts_list, status=status.HTTP_200_OK)
+        
 
 class FollowViewSet(ModelViewSet):
     queryset = User.objects.all()

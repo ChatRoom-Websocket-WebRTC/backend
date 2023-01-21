@@ -14,6 +14,7 @@ class User(AbstractUser):
     following_number = models.IntegerField(default=0)
     follower_number = models.IntegerField(default=0)
     is_admin = models.BooleanField(default=False, blank=True)
+    contact_list = models.CharField(default="",blank=True,max_length=1024)
     
     def follows(self, user):
         return user in self.following.all()
