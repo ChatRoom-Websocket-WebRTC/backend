@@ -56,8 +56,6 @@ class AdminViewSet(GenericViewSet):
             user = User.objects.get(username=request.data['username'])
             if(user.is_admin):
                 return Response(f'admin user can not be removed', status=status.HTTP_451_UNAVAILABLE_FOR_LEGAL_REASONS)
-            if(user.is_special):
-                return Response(f'special user can not be removed', status=status.HTTP_451_UNAVAILABLE_FOR_LEGAL_REASONS)
             user.delete()
             return Response(f'user with username {user.username} deleted', status=status.HTTP_200_OK)
         except User.DoesNotExist:

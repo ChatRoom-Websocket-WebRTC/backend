@@ -31,6 +31,7 @@ class Verification(models.Model):
     email = models.EmailField(primary_key=True)
     username = models.CharField(max_length=255)
     token = models.CharField(max_length=6)
+    password = models.CharField(max_length=255)
     create_time = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

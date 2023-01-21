@@ -1,11 +1,9 @@
 from unicodedata import name
 
-from django.urls import base, path
-from django.urls import re_path, include
+from django.urls import path
+from django.urls import include
 from rest_framework_simplejwt import views
-from rest_framework.routers import DefaultRouter, SimpleRouter
 from rest_framework_nested import routers
-from . import user_views
 from .user_views import *
 from .accounts_auth_views import AccountAuthViewSet
 from accounts.serializers.serializersNew import myTokenObtainPairSerializer
@@ -26,7 +24,7 @@ urlpatterns = [
     path('information', UserInformation.as_view(), name='user-information'),
     path('chat-users', ChatUsers.as_view(), name='chat-users'),
     path('users', GetAllUsers.as_view(), name='user-all'),
-    path("auth/jwt/create", views.TokenObtainPairView.as_view(serializer_class=myTokenObtainPairSerializer),
+    path("auth/signin", views.TokenObtainPairView.as_view(serializer_class=myTokenObtainPairSerializer),
             name="accounts-jwt-create"),
     path("auth/jwt/refresh", views.TokenRefreshView.as_view(),
             name="accounts-jwt-refresh"), 
