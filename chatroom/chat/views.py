@@ -6,10 +6,35 @@ from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework import generics, permissions, status
 from rest_framework import status
-from .models import Chat
-from .serializers import ChatSerializer
+from accounts.models import User
+from .models import Chat,Group,Message
+from .serializers import ChatSerializer,GroupeSeializer,MessageSerializer
 
+
+class ChatAPI(generics.GenericAPIView):
+    def get(self, username, room_name):
+        usern = User.objects.filter(username=username).first()
+        try:
+            selectgroup:Group = Group.objects.get(room_name = room_name)
+        except:
+            return Response({'error': 'group doesnt exist'}, status=status.HTTP_400_BAD_REQUEST)
+        return render(username, 'chat/room.html', {
+            'room_name': selectgroup.room_name,
+        })
+    
+class GroupAPI(generics.GenericAPIView):
+    def get(self,room_name):
+        group = Group.objects.filter(room_name = room_name).first()
+        serializer = GroupeSeializer(group)
+        return Response(serializer.data['members'],status=status.HTTP_200_OK)
+    
+class MessagesAPI(generics.GenericAPIView):
+    def get(self,room_name):
+        messages = Message.objects.filter(group = room_name).first()
+        serializer = MessageSerializer(messages)
+        return Response(serializer.data,status=status.HTTP_200_OK)
 
 class ChatViewSet(ModelViewSet):
     queryset = Chat.objects.all()

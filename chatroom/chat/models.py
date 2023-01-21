@@ -15,3 +15,14 @@ class Chat(models.Model):
     date_created = models.DateTimeField(auto_now_add=True)
     room_name = models.CharField(max_length=250)
     sender_type= models.CharField(max_length=6, choices=SenderType.choices, null=True)
+
+class Group(models.Model):
+    room_name = models.CharField(max_length=250)
+    members = models.ManyToManyField(User)
+
+class Message(models.Model):
+    sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sender')
+    group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name='receiver')
+    message = models.CharField(max_length=1200)
+
+
