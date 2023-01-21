@@ -16,7 +16,7 @@ from rest_framework.viewsets import GenericViewSet
 from rest_framework import mixins
 from .serializers.user_serializers import *
 from .models import User
-
+from django.core.mail import send_mail
 from drf_yasg.utils import swagger_auto_schema
 
 
@@ -52,7 +52,7 @@ class reset_password_seriliazer(serializers.Serializer):
 
 class reset_password_confirm_seriliazer(serializers.Serializer):
     token = serializers.CharField(max_length=50, help_text="sent token")
-    password = serializers.CharField(max_length=50, help_text="user password")
+    new_password = serializers.CharField(max_length=50, help_text="user password")
     uid = serializers.CharField(max_length=50)
 
 
@@ -90,7 +90,7 @@ class AccountAuthViewSet(GenericViewSet, mixins.CreateModelMixin, mixins.Retriev
                 template = render_to_string(
                     'activation.html',
                     {
-                        'username': user_username,
+                        'username': unregistered_user.username,
                         'otp': otp,
                         'WEBSITE_URL': 'chatroom.ir',
                     }
@@ -98,15 +98,16 @@ class AccountAuthViewSet(GenericViewSet, mixins.CreateModelMixin, mixins.Retriev
                 email_from = settings.EMAIL_HOST_USER
                 email_to = user_email
 
-                email = EmailMessage(email_title,
-                                     template,
-                                     email_from,
-                                     [email_to]
-                                     )
+                # email = EmailMessage(email_title,
+                #                      template,
+                #                      email_from,
+                #                      [email_to]
+                #                      )
 
-                email.content_subtype = "html"
-                email.fail_silently = False
-                email.send()
+                # email.content_subtype = "html"
+                # email.fail_silently = False
+                # email.send()
+                send_mail( 'تایید حساب کاربری در چت‌روم', template, email_from, [email_to] )
 
                 try:
                     # email resent
@@ -232,8 +233,6 @@ class AccountAuthViewSet(GenericViewSet, mixins.CreateModelMixin, mixins.Retriev
                                             'user': user,
                                             'token': token,
                                             'uid': uid,
-                                            'host': request.get_host(),
-                                            'port': request.get_port()
                                         })
 
             email = EmailMessage('بازنشانی رمز عبور در چت‌روم',
@@ -270,7 +269,8 @@ class AccountAuthViewSet(GenericViewSet, mixins.CreateModelMixin, mixins.Retriev
     def reset_pass_confirm(self, request, *args, **kwargs):
         uid = request.data.get('uid')
         token = request.data.get('token')
-        new_password = request.data.get('password')
+        new_password = request.data.get('new_password')
+        print(f"new_password: {new_password}")
 
         if uid is None or not uid:
             return Response(status=status.HTTP_400_BAD_REQUEST, data='uid is not Provided')
