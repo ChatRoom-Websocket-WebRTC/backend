@@ -227,7 +227,7 @@ class AccountAuthViewSet(GenericViewSet, mixins.CreateModelMixin, mixins.Retriev
             token = default_token_generator.make_token(user)
             uid = urlsafe_base64_encode(force_bytes(user.pk))
 
-            template = render_to_string('myemail/reset_password.html',
+            template = render_to_string('reset_password.html',
                                         {
                                             'user': user,
                                             'token': token,
@@ -236,7 +236,7 @@ class AccountAuthViewSet(GenericViewSet, mixins.CreateModelMixin, mixins.Retriev
                                             'port': request.get_port()
                                         })
 
-            email = EmailMessage('بازنشانی رمز عبور در ایرانگرد',
+            email = EmailMessage('بازنشانی رمز عبور در چت‌روم',
                                  template,
                                  settings.EMAIL_HOST_USER,
                                  [user_email]
