@@ -7,11 +7,11 @@ from .models import Chat,Group,Message
 
 class ChatConsumer(WebsocketConsumer):
     
-    def create_chat(self, id, message,room_name,username):
+    def create_chat(self, id, message,room_name,username,message_type):
         selectgroup = Group.objects.get(room_name = room_name)
         if 'user' not in self.scope.keys():
             self.scope['user'] = User.objects.get(username=username)
-        new_msg = Message.objects.create(sender=self.scope['user'], message=message, group=selectgroup)
+        new_msg = Message.objects.create(sender=self.scope['user'], message=message, group=selectgroup,message_type = message_type)
         new_msg.save()
 
     def get_all_messages(self):
@@ -35,7 +35,8 @@ class ChatConsumer(WebsocketConsumer):
         return {
             'id': message.id,
             'username' :message.sender.username,
-            'message': message.message
+            'message': message.message,
+            'message_type':message.message_type
         }
 
     def send_message(self, message):

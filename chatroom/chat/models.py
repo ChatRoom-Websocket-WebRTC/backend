@@ -21,8 +21,10 @@ class Group(models.Model):
     members = models.ManyToManyField(User)
 
 class Message(models.Model):
+    class MessageType(models.TextChoices):
+        file = 'FILE'
+        text = 'TEXT'
     sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sender')
     group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name='receiver')
-    message = models.CharField(max_length=1200)
-
-
+    message = models.CharField(max_length=483647)
+    message_type = models.CharField(max_length=4,choices=MessageType.choices, null=False)
