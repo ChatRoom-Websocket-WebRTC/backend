@@ -35,6 +35,7 @@ class ChatConsumer(WebsocketConsumer):
         return {
             'id': message.id,
             'username' :message.sender.username,
+            'room_name' : message.group.room_name,
             'message': message.message,
             'message_type':message.message_type
         }
@@ -109,4 +110,4 @@ class ChatConsumer(WebsocketConsumer):
 
     @sync_to_async
     def save_message(self , message, message_type, select_room_id,userid):
-        Chat.objects.create(message=message, message_type=message_type, group_id=select_room_id, sender_id=userid)
+        Chat.objects.create(message=message, message_type=message_type, group=select_room_id, sender=userid)
