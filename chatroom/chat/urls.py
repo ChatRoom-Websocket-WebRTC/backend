@@ -16,7 +16,9 @@ router.register('', ChatViewSet, basename='chat')
 urlpatterns = [
     path('', include(router.urls)),
     #path('room/<str:room_name>/username/<str:username>', views.room, name='room'),
+
     # path('<username>/<room_name>', ChatAPI.as_view(), name='room'),
     # path('<room_name>/members',GroupAPI.as_view() ,name="members"),
     path('<room_name>/messages',MessagesAPI.as_view(),name="messages")
+
 ]

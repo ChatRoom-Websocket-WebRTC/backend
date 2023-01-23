@@ -190,6 +190,9 @@ SIMPLE_JWT = {
 #socket_chat_layer
 CHANNEL_LAYERS = {
     'default': {
-        'BACKEND': "channels.layers.InMemoryChannelLayer"
+        'BACKEND': "channels.layers.InMemoryChannelLayer",
+        # 'CONFIG': {
+        #     'hosts': [('localhost', 6379)],
+        # },
         }
     }
