@@ -83,6 +83,22 @@ class ChatViewSet(ModelViewSet):
             return Response(serializer.data,status=status.HTTP_200_OK)
         except Exception as error:
             return Response(error, status=status.HTTP_400_BAD_REQUEST)
+    
+    @action(
+        detail=False,
+        methods=['get'],
+        url_path=r'groups/me',
+        url_name='groups',
+        permission_classes=[IsAuthenticated]
+    )
+    def get_groups(self, request, *args, **kwargs):
+        
+        try:
+            groups = request.user.group_set.all()
+            serializer = GroupeSeializer(groups, many=True) 
+            return Response(serializer.data,status=status.HTTP_200_OK)
+        except Exception as error:
+            return Response(error, status=status.HTTP_400_BAD_REQUEST)
 
 
 def room(request, room_name, username):
