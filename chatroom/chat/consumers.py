@@ -71,11 +71,11 @@ class ChatConsumer(WebsocketConsumer):
         message = text_data_json['message']
         message_type = text_data_json['message_type']
         username = text_data_json['username']
-        roon_name = text_data_json['room_name']
+        room_name = text_data_json['room_name']
         self.scope['user'] = User.objects.get(username=username)
-        select_room_id = Group.objects.get(room_name = roon_name).id
+        select_room = Group.objects.get(room_name = room_name)
 
-        async_to_sync(self.save_message)(message, message_type, select_room_id, self.scope['user'].id)
+        async_to_sync(self.save_message)(message, message_type, select_room, self.scope['user'])
 
         # Send message to room group
         async_to_sync(self.channel_layer.group_send)(
@@ -84,10 +84,12 @@ class ChatConsumer(WebsocketConsumer):
                 'type': 'chat_message',
                 'message': message,
                 'id': self.scope['user'].id,
-                'username' : username
+                'username' : username,
+                'message_type': message_type,
+                "room_name": room_name,
             }
         )
-        new_msg = self.create_chat(id, message,roon_name,username)
+        new_msg = self.create_chat(id, message,room_name,username, message_type)
 
     # Receive message from room group
     def chat_message(self, event):
@@ -109,5 +111,5 @@ class ChatConsumer(WebsocketConsumer):
         self.send(text_data=json.dumps(data))
 
     @sync_to_async
-    def save_message(self , message, message_type, select_room_id,userid):
-        Chat.objects.create(message=message, message_type=message_type, group=select_room_id, sender=userid)
+    def save_message(self , message, message_type, group,sender):
+        Message.objects.create(message=message, message_type=message_type, group=group, sender=sender)
