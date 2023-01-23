@@ -27,10 +27,12 @@ class ChatConsumer(WebsocketConsumer):
         # print (message.sender.userprofile.avatar)
         return {
             'id': message.id,
-            'username' :message.sender.username,
+            'sender' :message.sender.username,
             'room_name' : message.group.room_name,
             'message': message.message,
-            'message_type':message.message_type
+            'message_type':message.message_type,
+            "file_extension": message.file_extension
+            
         }
 
     def send_message(self, message):
@@ -61,15 +63,16 @@ class ChatConsumer(WebsocketConsumer):
     def receive(self, text_data=None, bytes_data=None):
         if(text_data):
             text_data_json = json.loads(text_data)
-
-            message = text_data_json['message']
+            
             message_type = text_data_json['message_type']
+            message = text_data_json['message']
             sender = text_data_json['sender']
             room_name = text_data_json['room_name']
+            file_extension = text_data_json['file_extension']
             self.scope['user'] = User.objects.get(username=sender)
             select_room = Group.objects.get(room_name = room_name)
 
-            async_to_sync(self.save_message)(message, message_type, select_room, self.scope['user'])
+            async_to_sync(self.save_message)(message, message_type, file_extension, select_room, self.scope['user'])
 
             # Send message to room group
             async_to_sync(self.channel_layer.group_send)(
@@ -81,10 +84,11 @@ class ChatConsumer(WebsocketConsumer):
                     'sender' : sender,
                     'message_type': message_type,
                     "room_name": room_name,
+                    "file_extension": file_extension
                 }
             )
         if(bytes_data):
-            pass
+            print(f"byted_data: {bytes_data}")
             
     # Receive message from room group
     def chat_message(self, event):
@@ -94,6 +98,7 @@ class ChatConsumer(WebsocketConsumer):
         message_type = event['message_type']
         group = event['room_name']
         sender = event['sender']
+        file_extension = event['file_extension']
 
 
         # Send message to WebSocket
@@ -101,11 +106,12 @@ class ChatConsumer(WebsocketConsumer):
             'message': message,
             'message_type':message_type,
             'sender': sender,
-            'room_name' : group
+            'room_name' : group,
+            "file_extension": file_extension
         }
         
         self.send(text_data=json.dumps(data))
 
     @sync_to_async
-    def save_message(self , message, message_type, group,sender):
-        Message.objects.create(message=message, message_type=message_type, group=group, sender=sender)
+    def save_message(self , message, message_type, file_extension, group,sender):
+        Message.objects.create(message=message, message_type=message_type, file_extension=file_extension, group=group, sender=sender)

@@ -28,3 +28,4 @@ class Message(models.Model):
     group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name='receiver')
     message = models.CharField(max_length=483647)
     message_type = models.CharField(max_length=4,choices=MessageType.choices, null=False)
+    file_extension = models.CharField(max_length=255, blank=True, null=True)
