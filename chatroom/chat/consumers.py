@@ -63,9 +63,9 @@ class ChatConsumer(WebsocketConsumer):
 
         message = text_data_json['message']
         message_type = text_data_json['message_type']
-        username = text_data_json['username']
+        sender = text_data_json['sender']
         room_name = text_data_json['room_name']
-        self.scope['user'] = User.objects.get(username=username)
+        self.scope['user'] = User.objects.get(username=sender)
         select_room = Group.objects.get(room_name = room_name)
 
         async_to_sync(self.save_message)(message, message_type, select_room, self.scope['user'])
@@ -77,7 +77,7 @@ class ChatConsumer(WebsocketConsumer):
                 'type': 'chat_message',
                 'message': message,
                 'id': self.scope['user'].id,
-                'username' : username,
+                'sender' : sender,
                 'message_type': message_type,
                 "room_name": room_name,
             }
@@ -89,16 +89,17 @@ class ChatConsumer(WebsocketConsumer):
         message = event['message']
         message_type = event['message_type']
         group = event['room_name']
-        username = event['username']
+        sender = event['sender']
 
 
         # Send message to WebSocket
         data = {
             'message': message,
             'message_type':message_type,
-            'username': username,
+            'sender': sender,
             'room_name' : group
         }
+        
         self.send(text_data=json.dumps(data))
 
     @sync_to_async
