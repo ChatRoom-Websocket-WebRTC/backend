@@ -58,30 +58,34 @@ class ChatConsumer(WebsocketConsumer):
         )
 
     # Receive message from WebSocket
-    def receive(self, text_data):
-        text_data_json = json.loads(text_data)
+    def receive(self, text_data=None, bytes_data=None):
+        if(text_data):
+            text_data_json = json.loads(text_data)
 
-        message = text_data_json['message']
-        message_type = text_data_json['message_type']
-        sender = text_data_json['sender']
-        room_name = text_data_json['room_name']
-        self.scope['user'] = User.objects.get(username=sender)
-        select_room = Group.objects.get(room_name = room_name)
+            message = text_data_json['message']
+            message_type = text_data_json['message_type']
+            sender = text_data_json['sender']
+            room_name = text_data_json['room_name']
+            self.scope['user'] = User.objects.get(username=sender)
+            select_room = Group.objects.get(room_name = room_name)
 
-        async_to_sync(self.save_message)(message, message_type, select_room, self.scope['user'])
+            async_to_sync(self.save_message)(message, message_type, select_room, self.scope['user'])
 
-        # Send message to room group
-        async_to_sync(self.channel_layer.group_send)(
-            self.room_group_name,
-            {
-                'type': 'chat_message',
-                'message': message,
-                'id': self.scope['user'].id,
-                'sender' : sender,
-                'message_type': message_type,
-                "room_name": room_name,
-            }
-        )
+            # Send message to room group
+            async_to_sync(self.channel_layer.group_send)(
+                self.room_group_name,
+                {
+                    'type': 'chat_message',
+                    'message': message,
+                    'id': self.scope['user'].id,
+                    'sender' : sender,
+                    'message_type': message_type,
+                    "room_name": room_name,
+                }
+            )
+        if(bytes_data):
+            pass
+            
     # Receive message from room group
     def chat_message(self, event):
         if ('message' not in event):
