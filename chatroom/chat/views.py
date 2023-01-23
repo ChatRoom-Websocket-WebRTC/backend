@@ -11,7 +11,9 @@ from rest_framework import status
 from accounts.models import User
 from .models import Chat,Group,Message
 from .serializers import ChatSerializer,GroupeSeializer,MessageSerializer
+import logging
 
+logger = logging.getLogger(__name__)
 
 class ChatAPI(generics.GenericAPIView):
     def get(self, username, room_name):
@@ -25,15 +27,15 @@ class ChatAPI(generics.GenericAPIView):
         })
     
 class GroupAPI(generics.GenericAPIView):
-    def get(self,room_name):
+    def get(self, request, room_name, **kwargs):
         group = Group.objects.filter(room_name = room_name).first()
         serializer = GroupeSeializer(group)
         return Response(serializer.data['members'],status=status.HTTP_200_OK)
     
 class MessagesAPI(generics.GenericAPIView):
-    def get(self,room_name):
-        messages = Message.objects.filter(group = room_name).first()
-        serializer = MessageSerializer(messages)
+    def get(self, request, room_name, **kwargs):
+        messages = Message.objects.filter(group__room_name = room_name)
+        serializer = MessageSerializer(messages, many=True)
         return Response(serializer.data,status=status.HTTP_200_OK)
 
 class ChatViewSet(ModelViewSet):
@@ -75,8 +77,8 @@ class ChatViewSet(ModelViewSet):
     def get_room_messages(self, request, room_name, *args, **kwargs):
         
         try:
-            chats = Message.objects.filter(group=room_name)
-            serializer = MessageSerializer(chats, many=True)
+            chats = Chat.objects.filter(room_name=room_name)
+            serializer = ChatSerializer(chats, many=True)
             return Response(serializer.data,status=status.HTTP_200_OK)
         except Exception as error:
             return Response(error, status=status.HTTP_400_BAD_REQUEST)

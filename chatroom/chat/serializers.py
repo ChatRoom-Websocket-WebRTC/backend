@@ -10,7 +10,7 @@ class ChatSerializer(serializers.ModelSerializer):
 
 class GroupeSeializer(serializers.ModelSerializer):
     class Meta:
-        meta = Group
+        model = Group
         fields = '__all__'
 
 class MessageSerializer(serializers.ModelSerializer):
@@ -18,4 +18,4 @@ class MessageSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Message
-        fields = ['sender', 'receiver', 'message','message_type']
+        fields = ['sender', 'group', 'message','message_type']
