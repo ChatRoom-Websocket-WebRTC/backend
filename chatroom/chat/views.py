@@ -28,6 +28,7 @@ class ChatAPI(generics.GenericAPIView):
     
 class GroupAPI(generics.GenericAPIView):
     def get(self, request, room_name, **kwargs):
+
         group = Group.objects.filter(room_name = room_name).first()
         serializer = GroupeSeializer(group)
         return Response(serializer.data['members'],status=status.HTTP_200_OK)
